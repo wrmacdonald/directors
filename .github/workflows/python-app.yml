@@ -40,4 +40,4 @@ jobs:
         MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
         MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
       run: |
-        python directors.py
+        python3 directors.py
