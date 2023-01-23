@@ -16,16 +16,16 @@ TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 # TMDB API - 
 TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
-# DB
-import pymongo
-MONGO_USERNAME = os.getenv('MONGO_USERNAME')
-MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
-conn_str = f"mongodb+srv://{MONGO_USERNAME}:{MONGO_PASSWORD}@cluster0.r4iszic.mongodb.net/?retryWrites=true&w=majority"
-client = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=5000)
+# # DB
+# import pymongo
+# MONGO_USERNAME = os.getenv('MONGO_USERNAME')
+# MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
+# conn_str = f"mongodb+srv://{MONGO_USERNAME}:{MONGO_PASSWORD}@cluster0.r4iszic.mongodb.net/?retryWrites=true&w=majority"
+# client = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=5000)
 
-# User Data - in MongoDB
-db = client.directors_db
-user_collection = db.user_collection
+# # User Data - in MongoDB
+# db = client.directors_db
+# user_collection = db.user_collection
 
 # Insert a new User
 # userDoc = {
@@ -41,8 +41,14 @@ user_collection = db.user_collection
 #     {"name.last": "MacDonald"},
 #     { "$set": {"pid_num_mc": [156, 2, 32, 17]}})
 
-# Get user data
-user = user_collection.find_one({ "name.last": "MacDonald" })
+# # Get user data
+# user = user_collection.find_one({ "name.last": "MacDonald" })
+
+# for testing without DB
+user = {
+    "pid": [1, 3, 30, 28974],
+    "pid_num_mc": [156, 2, 32, 17]
+}
 
 
 # Iterate through Following list
