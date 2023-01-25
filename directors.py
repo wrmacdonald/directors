@@ -4,11 +4,6 @@ import os
 from dotenv import load_dotenv
 import smtplib 
 
-# PLAN
-# get data from DB my_following: pid, num_mc
-# check the api for new additions
-# email/notify about new additions
-# update data in DB
 
 # Get env vars
 load_dotenv()
@@ -80,20 +75,12 @@ for i in range(len(user["pid"])):
     pmc_res_sorted = sorted(pmc_response.json()['crew'], key=lambda x: (x['release_date'] == "", x['release_date']))
 
     if (len(pmc_res_sorted) > pid_num_mc):
-        # print(f"{dir_name} - new projects:")
         for i in range(1, len(pmc_res_sorted) - pid_num_mc + 1):
-            # print(f"all {pmc_res_sorted[-i]}")
-            # print(f"checking pid:{pid}, saved # credits:{pid_num_mc}, found credits:{len(pmc_res_sorted)}.")
-            # print(f"    New Title from pid:{pid} - {pmc_res_sorted[-i]['original_title']}")
-            # print(f"    Overview: {pmc_res_sorted[-i]['overview']}")
-            # print("    -")
-
             dir_updates['director'].append(dir_name)
             dir_updates['num_mc'].append(len(pmc_res_sorted))
             dir_updates['title'].append(pmc_res_sorted[-i]['original_title'])
             dir_updates['overview'].append(pmc_res_sorted[-i]['overview'])
             dir_updates['release_date'].append(pmc_res_sorted[-i]['release_date'])
-    # print("------")
 
 
     # no sort
@@ -107,9 +94,6 @@ for i in range(len(user["pid"])):
 # Build up Message
 message = ""
 for i in range(len(dir_updates['director'])):
-    # print(dir_updates['director'][i])
-    # print(dir_updates['title'][i])
-    # print(dir_updates['overview'][i])
     if (i == 0) or (dir_updates['director'][i-1] != dir_updates['director'][i]):
         message += (f"{dir_updates['director'][i]} has the following new projects ({dir_updates['num_mc'][i]} total):\n")
     message += (f"  {pmc_res_sorted[-i]['original_title']} - Releasing: {pmc_res_sorted[-i]['release_date']}\n")
