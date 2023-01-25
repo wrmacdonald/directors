@@ -47,7 +47,7 @@ TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 # for testing without DB
 user = {
     "pid": [1, 3, 30, 28974],
-    "pid_num_mc": [157, 3, 33, 16]
+    "pid_num_mc": [157, 3, 33, 17]
 }
 
 # New data dict
