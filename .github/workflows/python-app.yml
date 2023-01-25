@@ -39,5 +39,8 @@ jobs:
         TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
         MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+        EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        EMAIL_ADDRESS_RCVR: ${{ secrets.EMAIL_ADDRESS_RCVR }}
       run: |
         python3 directors.py
