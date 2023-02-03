@@ -11,7 +11,7 @@ TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
 # Search Person
-person_query = "Damon Lindelof"
+person_query = "Denis villeneuve"
 sp_response = requests.get(f"{TMDB_BASE_URL}/search/person?api_key={TMDB_API_KEY}&language=en-US&query={person_query}&page=1&include_adult=false")
 with open("sp_data.json", "w") as data_file:
     json.dump(sp_response.json(), data_file, indent=4, sort_keys=True)

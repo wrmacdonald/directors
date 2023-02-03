@@ -46,8 +46,8 @@ TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
 # for testing without DB
 user = {
-    "pid": [1, 3, 30, 28974],
-    "pid_num_mc": [157, 3, 33, 18]
+    "pid": [1, 30, 28974, 1032, 71609, 10491, 118415, 10757, 4762, 68813, 5655, 12453, 21684, 137427],
+    "pid_num_mc": [157, 33, 18, 167, 19, 39, 42, 47, 50, 20, 51, 70, 50, 35] 
 }
 
 # New data dict
@@ -95,9 +95,10 @@ for i in range(len(user["pid"])):
 message = ""
 for i in range(len(dir_updates['director'])):
     if (i == 0) or (dir_updates['director'][i-1] != dir_updates['director'][i]):
+        message += ("-----\n")
         message += (f"{dir_updates['director'][i]} has the following new projects ({dir_updates['num_mc'][i]} total):\n")
-    message += (f"  {pmc_res_sorted[-i]['original_title']} - Releasing: {pmc_res_sorted[-i]['release_date']}\n")
-    message += (f"    Overview: {pmc_res_sorted[-i]['overview']}\n")
+    message += (f"  {dir_updates['title'][i]} - Releasing: {dir_updates['release_date'][i]}\n")
+    message += (f"    Overview: {dir_updates['overview'][i]}\n")
     message += ("    -\n")
 
 
@@ -115,4 +116,6 @@ if message:
             to_addrs=EMAIL_ADDRESS, 
             msg=f"subject:Director Updates \n\n {unicode_message}"
         )
+
+# print(message)    # Testing
 
