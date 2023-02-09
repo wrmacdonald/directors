@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import smtplib 
+import boto3
 
 # Env vars
 TMDB_API_KEY = os.environ.get('TMDB_API_KEY')
@@ -12,19 +13,32 @@ EMAIL_ADDRESS_RCVR = os.environ.get('EMAIL_ADDRESS_RCVR')
 # TMDB API - 
 TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
+# AWS DynamoDB
+dynamodb = boto3.resource('dynamodb')
+DB_dir1 = dynamodb.Table('directors1')
+# print(DB_dir1.creation_date_time)    # Test connection
+response = DB_dir1.get_item(
+    Key={
+        'User': 'Wes'
+    }
+)
+item = response['Item']
+
 def lambda_handler(event, context):
-    # Run Context
-    print(event['scheduled'])
+    # Set Run Context
     if event['scheduled']:
         run_context = 'Scheduled'
     else:
         run_context = 'Testing'
+        
+    # Following Data from DynamoDB
+    user = user_creator(item)
     
     # Following Data for testing without DB
-    user = {
-        "pid": [1, 30, 28974, 1032, 71609, 10491, 118415, 10757, 4762, 68813, 5655, 12453, 21684, 137427],
-        "pid_num_mc": [158, 33, 18, 167, 19, 39, 42, 47, 50, 20, 52, 78, 51, 32] 
-    }
+    # user = {
+    #     "pid": [1, 30, 28974, 1032, 71609, 10491, 118415, 10757, 4762, 68813, 5655, 12453, 21684, 137427],
+    #     "pid_num_mc": [158, 33, 18, 167, 19, 39, 42, 47, 50, 20, 52, 78, 51, 32] 
+    # }
 
     # New data dict
     dir_updates = {
@@ -103,5 +117,17 @@ def lambda_handler(event, context):
     else:
         return 'No New Movies'
 
-
+def user_creator(user_item):
+    # Takes in user_item from dynamoDB & create a matching user dict, with ints
+    # in: DynamoDB user Item
+    # out: user dict with pid & pid_num_mc fields
+    user = {
+        "pid": [],
+        "pid_num_mc": []
+    }
+    for i in range(len(user_item['pid'])):
+        user['pid'].append(int(user_item['pid'][i]))
+        user['pid_num_mc'].append(int(user_item['pid_num_mc'][i]))
+    return user
+        
 
