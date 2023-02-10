@@ -3,6 +3,7 @@ import requests
 import os
 import smtplib 
 import boto3
+from decimal import Decimal
 
 # Env vars
 TMDB_API_KEY = os.environ.get('TMDB_API_KEY')
@@ -17,12 +18,7 @@ TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 dynamodb = boto3.resource('dynamodb')
 DB_dir1 = dynamodb.Table('directors1')
 # print(DB_dir1.creation_date_time)    # Test connection
-response = DB_dir1.get_item(
-    Key={
-        'User': 'Wes'
-    }
-)
-item = response['Item']
+
 
 def lambda_handler(event, context):
     # Set Run Context
@@ -30,15 +26,22 @@ def lambda_handler(event, context):
         run_context = 'Scheduled'
     else:
         run_context = 'Testing'
-        
-    # Following Data from DynamoDB
-    user = user_creator(item)
     
-    # Following Data for testing without DB
-    # user = {
-    #     "pid": [1, 30, 28974, 1032, 71609, 10491, 118415, 10757, 4762, 68813, 5655, 12453, 21684, 137427],
-    #     "pid_num_mc": [158, 33, 18, 167, 19, 39, 42, 47, 50, 20, 52, 78, 51, 32] 
-    # }
+    # Vars
+    updated = False
+        
+    # DynamoDB GET data
+    response = DB_dir1.get_item(
+        Key={
+            'User': 'Wes'
+        }
+    )
+    item = response['Item']
+    # print(item)     # Testing DB
+    
+    # Following Data (converted to int) from DynamoDB
+    user = user_creator(item)
+
 
     # New data dict
     dir_updates = {
@@ -66,13 +69,22 @@ def lambda_handler(event, context):
         pmc_res_sorted = sorted(pmc_response.json()['crew'], key=lambda x: (x['release_date'] == "", x['release_date']))
 
         if (len(pmc_res_sorted) > pid_num_mc):
-            for i in range(1, len(pmc_res_sorted) - pid_num_mc + 1):
+            updated = True
+            new_pid_num_mc = len(pmc_res_sorted)
+            
+            # add new moview to updates
+            for j in range(1, new_pid_num_mc - pid_num_mc + 1):
                 dir_updates['director'].append(dir_name)
                 dir_updates['pid'].append(pid)
-                dir_updates['num_mc'].append(len(pmc_res_sorted))
-                dir_updates['title'].append(pmc_res_sorted[-i]['original_title'])
-                dir_updates['overview'].append(pmc_res_sorted[-i]['overview'])
-                dir_updates['release_date'].append(pmc_res_sorted[-i]['release_date'])
+                dir_updates['num_mc'].append(new_pid_num_mc)
+                dir_updates['title'].append(pmc_res_sorted[-j]['original_title'])
+                dir_updates['overview'].append(pmc_res_sorted[-j]['overview'])
+                dir_updates['release_date'].append(pmc_res_sorted[-j]['release_date'])
+            
+            # Update Following Data with new movie counts
+            print(f"old: {pid_num_mc}, new: {new_pid_num_mc}, i: {i}")
+            user["pid_num_mc"][i] = new_pid_num_mc
+            
 
 
         # no sort
@@ -109,7 +121,23 @@ def lambda_handler(event, context):
                 to_addrs=EMAIL_ADDRESS, 
                 msg=f"subject:Director Updates - {run_context} \n\n {unicode_message}"
             )
-
+    
+    # Update DB - convert pid_num_mc int list to DynamoDB list
+    if updated:
+        pid_num_mc_updated = [Decimal(i) for i in user["pid_num_mc"]]
+        print(pid_num_mc_updated)
+        
+        DB_dir1.update_item(
+            Key={
+                'User': 'Wes'
+            },
+            UpdateExpression='SET pid_num_mc = :val1',
+            ExpressionAttributeValues={
+                ':val1': pid_num_mc_updated
+            }
+        )
+    
+    
     print(message)    # Testing
     
     if message: 
