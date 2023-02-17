@@ -8,7 +8,7 @@ from decimal import Decimal
 # Env vars
 TMDB_API_KEY = os.environ.get('TMDB_API_KEY')
 # Email
-EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
+EMAIL_ADDRESS_DEV = os.environ.get('EMAIL_ADDRESS')
 EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_ADDRESS_RCVR = os.environ.get('EMAIL_ADDRESS_RCVR')
 # TMDB API - 
@@ -113,12 +113,17 @@ def lambda_handler(event, context):
     # Send Email if there are updates
     if message:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as connection:  
-            email_address = EMAIL_ADDRESS
+            email_address = EMAIL_ADDRESS_DEV
             email_password = EMAIL_PASSWORD
             connection.login(email_address, email_password)
+            # Check test run or not
+            if event['test']:
+                to_email_address=EMAIL_ADDRESS_DEV, 
+            else:
+                to_email_address=EMAIL_ADDRESS_RCVR, 
             connection.sendmail(
                 from_addr=email_address, 
-                to_addrs=EMAIL_ADDRESS, 
+                to_addrs=to_email_address, 
                 msg=f"subject:Director Updates - {run_context} \n\n {unicode_message}"
             )
     
